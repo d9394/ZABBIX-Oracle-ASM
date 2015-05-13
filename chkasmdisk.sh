@@ -1,17 +1,16 @@
-
 #!/bin/bash
 
 if [ -z $1 ]; then
 	sqlplus -s / as sysdba << EOF > /dev/null
-set head off
+SET HEAD OFF
 SET TERMOUT OFF
-spool /tmp/asmdiskgroup.txt
-select  NAME, TOTAL_MB, FREE_MB from v\$asm_diskgroup;
-spool off
+SPOOL /tmp/asmdiskgroup.txt
+SELECT  NAME FROM v\$asm_diskgroup;
+SPOOL off
 exit;
 EOF
 
-	DATA=($(awk '{ print $1 }' /tmp/asmdiskgroup.txt))
+	DATA=($(cat /tmp/asmdiskgroup.txt))
 	LAST=${DATA[${#DATA[@]} -1]}
 
 	echo -e "{ \n \t\"data\": ["
@@ -25,11 +24,11 @@ EOF
 	echo -e '\t] \n}'
 else
         sqlplus -s / as sysdba << EOF > /dev/null
-set head off
+SET HEAD OFF
 SET TERM OFF
-spool /tmp/asmdisk.txt
-select  NAME, TOTAL_MB, FREE_MB from v\$asm_diskgroup where NAME='$1';
-spool off
+SPOOL /tmp/asmdisk.txt
+SELECT  NAME, TOTAL_MB, FREE_MB FROM v\$asm_diskgroup WHERE NAME='$1';
+SPOOL off
 exit;
 EOF
 	if [ $2 == "asmname" ]; then
